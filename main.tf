@@ -59,7 +59,7 @@ module "nat" {
   app_cidr              = "${var.app_cidr}"
 }
   
-#MODULE INSTANCE NAT
+#MODULE ROUTE TABLES
 module "route_tables" {
   source = "./route_tables"
 
