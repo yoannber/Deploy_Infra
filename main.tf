@@ -5,7 +5,7 @@ terraform{
   }
 }
 
-#DATA
+#DATA AMI
 data "aws_ami" "ubuntu" {
   most_recent = true
   filter {
