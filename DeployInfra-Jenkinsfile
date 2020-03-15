@@ -1,0 +1,134 @@
+properties([
+    parameters([
+        choice(choices: ['Deploy', 'Destroy'],description: '', name: 'INFRA'),
+        choice(choices: ['dev', 'preprod', 'prod'],description: '', name: 'ENV'),
+        string(defaultValue: 'WebApache', description: '', name: 'APP_NAME', trim: false),
+        string(defaultValue: 'eu-west-3', description: '', name: 'APP_REGION', trim: false)
+    ]),
+    disableConcurrentBuilds(),
+    buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '1', numToKeepStr: '3'))
+])
+
+pipeline {
+    agent any
+    
+    environment {
+        GitBranch = "master"
+        CIDR_DEV = "10.10"
+        CIDR_PREPROD = "10.11"
+        CIDR_PROD = "10.12"
+    }
+
+    stages {
+        stage('Check Vars') {
+            steps {
+                sh "echo check first if vars are compliant"
+
+            }
+        }
+        
+        stage('Clean Jenkins Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout Git') {
+            steps {
+                dir("Deploy_Infra") {
+                    git(
+                        url: 'https://github.com/Aunril/Deploy_Infra.git',
+                        credentialsId: '1a1a1d03-9a1a-4db0-bfef-553f5921c54e',
+                        branch: "${GitBranch}"
+                    )
+                }
+            }
+        }
+
+        stage('Deploy Infra Dev') {
+            when {
+                expression { params.INFRA == 'Deploy' && params.ENV == 'dev'}
+            }
+            steps {
+                dir("Deploy_Infra") {
+                    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                        sh "terraform init \
+                        -backend-config='bucket=tp-devops-yoann' \
+                        -backend-config='region=eu-west-3' \
+                        -backend-config='key=${APP_NAME}/${ENV}/Deploy_Infra'"
+                        
+                        sh "terraform apply --auto-approve \
+                        -var env=$ENV \
+			-var app_name=$APP_NAME \
+			-var app_cidr=$CIDR_DEV \
+			-var app_region=$APP_REGION"
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy Infra Preprod') {
+            when {
+                expression { params.INFRA == 'Deploy' && params.ENV == 'preprod'}
+            }
+            steps {
+                dir("Deploy_Infra") {
+                    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                        sh "terraform init \
+                        -backend-config='bucket=tp-devops-yoann' \
+                        -backend-config='region=eu-west-3' \
+                        -backend-config='key=${APP_NAME}/${ENV}/Deploy_Infra'"
+                        
+                        sh "terraform apply --auto-approve \
+                        -var env=$ENV \
+			-var app_name=$APP_NAME \
+			-var app_cidr=$CIDR_PREPROD \
+			-var app_region=$APP_REGION"
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy Infra Prod') {
+            when {
+                expression { params.INFRA == 'Deploy' && params.ENV == 'prod'}
+            }
+            steps {
+                dir("Deploy_Infra") {
+                    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                        sh "terraform init \
+                        -backend-config='bucket=tp-devops-yoann' \
+                        -backend-config='region=eu-west-3' \
+                        -backend-config='key=${APP_NAME}/${ENV}/Deploy_Infra'"
+                        
+                        sh "terraform apply --auto-approve \
+                        -var env=$ENV \
+			-var app_name=$APP_NAME \
+			-var app_cidr=$CIDR_PROD \
+			-var app_region=$APP_REGION"
+                    }
+                }
+            }
+        }
+        
+        stage('Destroy Infra') {
+            when {
+                expression { params.INFRA == 'Destroy' }
+            }
+            steps {
+                dir("Deploy_Infra") {
+                    wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                        sh "terraform init \
+                        -backend-config='bucket=tp-devops-yoann' \
+                        -backend-config='region=eu-west-3' \
+                        -backend-config='key=${APP_NAME}/${ENV}/Deploy_Infra'"
+                        
+                        sh "terraform destroy --auto-approve \
+			-var app_region=$APP_REGION"
+                    }
+                }
+            }
+        }
+
+    }
+}
