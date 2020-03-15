@@ -7,7 +7,6 @@ terraform{
   }
 }
 
-
 #VARIABLES
 variable "env" {
   type = string
@@ -25,12 +24,10 @@ variable "app_region" {
   type = string
 }
 
-
 #PROVIDER
 provider "aws" {
   region  = "${var.app_region}"
 }
-
 
 #VPC
 resource "aws_vpc" "main" {
@@ -40,7 +37,6 @@ resource "aws_vpc" "main" {
   }
 }
 
-
 #IGW
 resource "aws_internet_gateway" "main" {
   vpc_id = "${aws_vpc.main.id}"
@@ -48,7 +44,6 @@ resource "aws_internet_gateway" "main" {
     Name = "${var.app_name}-${var.env}-igw"
   }
 }
-
 
 #SUBNETS
 resource "aws_subnet" "public1" {
@@ -105,7 +100,7 @@ resource "aws_subnet" "private3" {
   }
 }
 
-
+#DATA
 data "aws_ami" "ubuntu" {
   most_recent = true
   filter {
@@ -114,7 +109,6 @@ data "aws_ami" "ubuntu" {
   }
   owners = ["099720109477"]
 }
-
 
 #NAT
 resource "aws_instance" "nat" {
@@ -129,7 +123,6 @@ resource "aws_instance" "nat" {
     Name = "${var.app_name}-${var.env}-nat"
   }
 }
-
 
 #NAT_SG
 resource "aws_security_group" "nat" {
@@ -156,7 +149,6 @@ resource "aws_security_group_rule" "nat-egress" {
   security_group_id = aws_security_group.nat.id
 }
 
-
 #MAIN_RTB
 resource "aws_default_route_table" "main" {
   default_route_table_id = "${aws_vpc.main.default_route_table_id}"
@@ -169,7 +161,6 @@ resource "aws_default_route_table" "main" {
   }
 }
 
-
 #CUSTOM_RTB
 resource "aws_route_table" "custom" {
   vpc_id = "${aws_vpc.main.id}"
@@ -181,7 +172,6 @@ resource "aws_route_table" "custom" {
     Name = "${var.app_name}-${var.env}-custom-rtb"
   }
 }
-
 
 #RTB_ASSOCIATION
 resource "aws_route_table_association" "pub1" {
