@@ -75,5 +75,4 @@ module "route_tables" {
   app_name              = "${var.app_name}"
   env                   = "${var.env}"
   vpc_id                = "${aws_vpc.main.id}"
-  app_cidr              = "${var.app_cidr}"
 }
