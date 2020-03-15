@@ -1,19 +1,19 @@
  variable "vpc_id" {
-  type = "string"
+   type = string
 }
 
 variable "app_cidr" {
-  type = "string"
+  type = string
 }
 
 variable "app_region" {
-  type = "string"
+  type = string
 }
 
 variable "app_name" {
-  type = "string"
+  type = string
 }
 
 variable "env" {
-  type = "string"
+  type = string
 }
