@@ -3,7 +3,7 @@ properties([
         choice(choices: ['Deploy', 'Destroy'],description: '', name: 'INFRA'),
         choice(choices: ['dev', 'preprod', 'prod'],description: '', name: 'ENV'),
         string(defaultValue: 'WebApache', description: '', name: 'APP_NAME', trim: false),
-        string(defaultValue: 'eu-west-3', description: '', name: 'APP_REGION', trim: false)
+        string(defaultValue: 'us-east-1', description: '', name: 'APP_REGION', trim: false)
     ]),
     disableConcurrentBuilds(),
     buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '1', numToKeepStr: '3'))
@@ -37,8 +37,8 @@ pipeline {
             steps {
                 dir("Deploy_Infra") {
                     git(
-                        url: 'https://github.com/Aunril/Deploy_Infra.git',
-                        credentialsId: '1a1a1d03-9a1a-4db0-bfef-553f5921c54e',
+                        url: 'https://github.com/zfiel/Deploy_Infra.git',
+                        credentialsId: 'e7aa4132-ba7d-44ff-aaef-366463f7dcc2',
                         branch: "${GitBranch}"
                     )
                 }
@@ -53,8 +53,8 @@ pipeline {
                 dir("Deploy_Infra") {
                     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                         sh "terraform init \
-                        -backend-config='bucket=tp-devops-yoann' \
-                        -backend-config='region=eu-west-3' \
+                        -backend-config='bucket=bucket-de-la-mort' \
+                        -backend-config='region=us-east-1' \
                         -backend-config='key=${APP_NAME}/${ENV}/Deploy_Infra'"
                         
                         sh "terraform apply --auto-approve \
@@ -75,8 +75,8 @@ pipeline {
                 dir("Deploy_Infra") {
                     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                         sh "terraform init \
-                        -backend-config='bucket=tp-devops-yoann' \
-                        -backend-config='region=eu-west-3' \
+                        -backend-config='bucket=bucket-de-la-mort' \
+                        -backend-config='region=us-east-1' \
                         -backend-config='key=${APP_NAME}/${ENV}/Deploy_Infra'"
                         
                         sh "terraform apply --auto-approve \
@@ -97,8 +97,8 @@ pipeline {
                 dir("Deploy_Infra") {
                     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                         sh "terraform init \
-                        -backend-config='bucket=tp-devops-yoann' \
-                        -backend-config='region=eu-west-3' \
+                        -backend-config='bucket=bucket-de-la-mort' \
+                        -backend-config='region=us-east-1' \
                         -backend-config='key=${APP_NAME}/${ENV}/Deploy_Infra'"
                         
                         sh "terraform apply --auto-approve \
@@ -119,8 +119,8 @@ pipeline {
                 dir("Deploy_Infra") {
                     wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
                         sh "terraform init \
-                        -backend-config='bucket=tp-devops-yoann' \
-                        -backend-config='region=eu-west-3' \
+                        -backend-config='bucket=bucket-de-la-mort' \
+                        -backend-config='region=us-east-1' \
                         -backend-config='key=${APP_NAME}/${ENV}/Deploy_Infra'"
                         
                         sh "terraform destroy --auto-approve \
@@ -129,6 +129,5 @@ pipeline {
                 }
             }
         }
-
     }
 }
