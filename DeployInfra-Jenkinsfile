@@ -23,7 +23,11 @@ pipeline {
         stage('Check Vars') {
             steps {
                 sh "echo check first if vars are compliant"
-
+                
+                sh "echo DEPLOY OR DESTROY: $INFRA"
+                sh "echo ENV: $ENV"
+                sh "echo APP_NAME: $APP_NAME"
+                sh "echo APP_REGION: $APP_REGION"
             }
         }
         
